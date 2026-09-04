@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QR Code — Descubra Seu Candidato</title>
+<style>
+  :root{
+    --paper:#1B2130; --panel:#232B3E; --ink:#F3EFE3; --ink-soft:#A7ADC0; --rule:#3A4459; --gold:#F2B441;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    min-height:100vh; display:flex; justify-content:center; padding:40px 16px;
+  }
+  .stage{ width:100%; max-width:440px; text-align:center; }
+  h1{ font-family:"Georgia",serif; font-size:22px; margin:0 0 8px; }
+  p{ font-size:13.5px; color:var(--ink-soft); line-height:1.55; margin:0 0 22px; }
+  input{
+    width:100%; font-size:14px; padding:11px 13px; margin-bottom:14px;
+    border:1px solid var(--rule); border-radius:8px; background:var(--panel); color:var(--ink);
+    font-family:inherit;
+  }
+  button{
+    padding:11px 20px; background:var(--gold); color:var(--paper); border:none;
+    border-radius:8px; font-family:inherit; font-size:14px; font-weight:700; cursor:pointer;
+  }
+  .qr-box{
+    margin-top:26px; background:#fff; border-radius:12px; padding:20px;
+    display:inline-block;
+  }
+  .qr-box img{ display:block; width:280px; height:280px; }
+  .link-echo{
+    margin-top:14px; font-size:12.5px; color:var(--ink-soft); word-break:break-all;
+  }
+  .hint{ margin-top:18px; font-size:12px; color:var(--ink-soft); }
+  @media print{
+    body{ background:#fff; color:#000; }
+    .no-print{ display:none; }
+    .qr-box{ box-shadow:none; }
+  }
+</style>
+</head>
+<body>
+<div class="stage">
+  <h1>Gerar QR Code</h1>
+  <p class="no-print">Cole abaixo o link publicado do "Descubra Seu Candidato" (ex.: seu link do GitHub Pages) e clique em gerar.</p>
+  <input type="text" id="urlInput" class="no-print" placeholder="https://seu-usuario.github.io/cedula-de-ideias/">
+  <button id="genBtn" class="no-print">Gerar QR Code</button>
+
+  <div id="qrResult"></div>
+
+  <p class="hint no-print">Depois de gerar, use Ctrl+P (ou Cmd+P) pra imprimir só o QR code, ou clique com o botão direito na imagem pra salvar.</p>
+</div>
+
+<script>
+const urlInput = document.getElementById('urlInput');
+const genBtn = document.getElementById('genBtn');
+const qrResult = document.getElementById('qrResult');
+
+function generate(){
+  const url = urlInput.value.trim();
+  if(!url) return;
+  const encoded = encodeURIComponent(url);
+  qrResult.innerHTML = `
+    <div class="qr-box">
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=${encoded}" alt="QR Code">
+    </div>
+    <div class="link-echo">${url}</div>
+  `;
+}
+
+genBtn.addEventListener('click', generate);
+urlInput.addEventListener('keydown', e => { if(e.key === 'Enter') generate(); });
+
+// Se a página for aberta com ?url=... já gera direto (útil se eu já souber seu link)
+const params = new URLSearchParams(window.location.search);
+if(params.get('url')){
+  urlInput.value = params.get('url');
+  generate();
+}
+</script>
+</body>
+</html>
